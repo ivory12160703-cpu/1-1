@@ -1,0 +1,238 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>영화 티어리스트</title>
+<style>
+  :root {
+    --bg: #f5f5f5;
+    --panel: #ffffff;
+    --line: #e2e2e2;
+    --text: #222;
+    --muted: #888;
+    --accent: #333;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header h1 { font-size: 20px; margin: 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  button {
+    font-family: inherit;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover { background: #f0f0f0; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: #000; }
+  button.danger { color: #c0392b; border-color: #e6b0aa; }
+  input, select {
+    font-family: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+  }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 13px; margin-bottom: 4px; color: var(--muted); }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .hidden { display: none !important; }
+
+  /* 대시보드 목록 */
+  .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; }
+  .list-item { cursor: pointer; }
+  .list-item h3 { margin: 0 0 4px; font-size: 16px; }
+
+  /* 영화 포스터 */
+  .movie {
+    width: 70px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #fafafa;
+    text-align: center;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+  }
+  .movie img { width: 100%; height: 100px; object-fit: cover; display: block; background:#ddd; }
+  .movie .title { font-size: 10px; padding: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .movie .tip {
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: #000; color: #fff; font-size: 11px; padding: 6px 8px; border-radius: 6px;
+    width: 160px; display: none; z-index: 10; text-align: left; line-height: 1.4;
+  }
+  .movie:hover .tip { display: block; }
+  .movie.dragging { opacity: .4; }
+
+  /* 티어 행 */
+  .tier-row { display: flex; align-items: stretch; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .tier-label { width: 60px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; color:#fff; flex-shrink: 0; }
+  .tier-drop { flex: 1; min-height: 110px; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; background: #fff; }
+  .tier-drop.over { background: #eef4ff; }
+
+  .pool { display: flex; flex-wrap: wrap; gap: 8px; min-height: 110px; padding: 8px; border: 1px dashed var(--line); border-radius: 8px; background:#fafafa; }
+  .pool.over { background: #eef4ff; }
+
+  .row-flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+  .row-flex .field { flex: 1; min-width: 140px; margin-bottom: 0; }
+
+  .notice { font-size: 12px; color: var(--muted); background:#fffbe6; border:1px solid #f0e0a0; padding:8px 10px; border-radius:6px; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 영화 티어리스트</h1>
+  <span class="muted">브라우저 저장(localStorage) 기반 데모 · 한 브라우저 안에서만 공유됩니다</span>
+</header>
+
+<main>
+  <!-- 안내 -->
+  <div class="notice" id="globalNotice">
+    ⚠️ 이 데모는 외부 서버 없이 동작합니다. 영화 데이터는 내장 샘플이며, 비밀번호는 같은 화면에서 실수를 막는 용도일 뿐 실제 보안 기능이 아닙니다.
+  </div>
+  <br/>
+
+  <!-- ===== 대시보드 ===== -->
+  <section id="dashboard">
+    <div class="toolbar">
+      <button class="primary" onclick="openCreate()">+ 새 티어리스트 등록</button>
+      <button onclick="openCompare()">친구 평가 비교 / 종합 순위</button>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0;">전체 티어리스트</h2>
+      <div id="listGrid" class="list-grid"></div>
+      <p id="emptyMsg" class="muted">아직 등록된 티어리스트가 없습니다. 새로 만들어 보세요!</p>
+    </div>
+  </section>
+
+  <!-- ===== 등록 화면 ===== -->
+  <section id="createView" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0;">새 티어리스트 등록</h2>
+      <div class="field">
+        <label>닉네임 (필수)</label>
+        <input id="newNick" placeholder="사용자를 구분하는 이름" />
+      </div>
+      <div class="field">
+        <label>비밀번호 (필수 · 수정 권한 확인용)</label>
+        <input id="newPw" type="password" placeholder="비밀번호" />
+      </div>
+      <div class="field">
+        <label>티어리스트 이름 (선택)</label>
+        <input id="newTitle" placeholder="예: 2024 인생영화" />
+      </div>
+      <div class="toolbar">
+        <button class="primary" onclick="createList()">만들기</button>
+        <button onclick="showDashboard()">취소</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 상세/편집 화면 ===== -->
+  <section id="detailView" class="hidden">
+    <div class="toolbar">
+      <button onclick="showDashboard()">← 목록으로</button>
+      <button id="editBtn" onclick="requestEdit()">수정하기</button>
+      <button id="doneBtn" class="primary hidden" onclick="finishEdit()">편집 완료</button>
+      <button onclick="exportImage()">이미지(PNG) 저장</button>
+      <button id="delBtn" class="danger hidden" onclick="deleteList()">삭제</button>
+    </div>
+
+    <div class="card">
+      <h2 id="detailTitle" style="margin:0 0 4px;"></h2>
+      <div class="muted" id="detailMeta"></div>
+    </div>
+
+    <!-- 편집 전용 영역 -->
+    <div id="editTools" class="card hidden">
+      <h3 style="margin-top:0;">영화 추가</h3>
+      <div class="field">
+        <label>영화 검색 (내장 샘플)</label>
+        <input id="searchBox" placeholder="제목 입력 후 결과 클릭" oninput="renderSearch()" />
+      </div>
+      <div id="searchResult" class="pool" style="border-style:solid;"></div>
+
+      <h3>직접 추가</h3>
+      <div class="row-flex" style="margin-bottom:10px;">
+        <div class="field"><label>제목</label><input id="mTitle" /></div>
+        <div class="field"><label>개봉연도</label><input id="mYear" /></div>
+        <div class="field"><label>장르</label><input id="mGenre" /></div>
+      </div>
+      <div class="row-flex" style="margin-bottom:10px;">
+        <div class="field"><label>줄거리</label><input id="mPlot" /></div>
+        <div class="field"><label>평점</label><input id="mRating" placeholder="예: 8.5" /></div>
+        <div class="field"><label>포스터 업로드</label><input id="mPoster" type="file" accept="image/*" /></div>
+      </div>
+      <button class="primary" onclick="addCustomMovie()">영화 추가</button>
+    </div>
+
+    <!-- 티어 영역 -->
+    <div class="card">
+      <div id="tierContainer"></div>
+      <h3>미분류 영화 (여기서 끌어다 등급에 배치)</h3>
+      <div id="poolDrop" class="pool"></div>
+    </div>
+  </section>
+
+  <!-- ===== 비교 화면 ===== -->
+  <section id="compareView" class="hidden">
+    <div class="toolbar"><button onclick="showDashboard()">← 목록으로</button></div>
+    <div class="card">
+      <h2 style="margin-top:0;">영화별 종합 순위 (평균 등급)</h2>
+      <p class="muted">등급 환산: S=6, A=5, B=4, C=3, D=2, F=1 · 여러 티어리스트에 걸친 평균입니다.</p>
+      <table id="rankTable">
+        <thead><tr><th>순위</th><th>영화</th><th>평균 점수</th><th>평가 수</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ============ 데이터 모델 ============ */
+const TIERS = [
+  { key:'S', label:'S', color:'#e74c3c', score:6 },
+  { key:'A', label:'A', color:'#e67e22', score:5 },
+  { key:'B', label:'B', color:'#f1c40f', score:4 },
+  { key:'C', label:'C', color:'#2ecc71', score:3 },
+  { key:'D', label:'D', color:'#3498db', score:2 },
+  { key:'F', label:'F', color:'#95a5a6', score:1 },
+];
+
+// 내장 샘플 영화 (외부 API 대체용 가상 데이터)
+const SAMPLE_MOVIES = [
+  { id:'s1', title:'인셉션', year:'2010', genre:'SF/액션', plot:'꿈 속에서 생각을 훔치는 이야기', rating:'8.8' },
+  { id:'s2', title:'기생충', year:'2019', genre:'드라마',

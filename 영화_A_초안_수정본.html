@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>무비 티어리스트</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#20242c;--muted:#77808d;--line:#e7e9ee;--accent:#4d68e8;--accent2:#eef1ff;--shadow:0 12px 34px rgba(24,32,56,.07);--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:10px 14px;background:#20242c;color:white;font-weight:650}button.secondary{background:#f0f2f6;color:#343b48}button.primary{background:var(--accent);color:#fff}button.ghost{background:transparent;color:var(--muted);padding:8px}button:disabled{opacity:.45;cursor:not-allowed}
+header{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100vw - 1180px)/2));position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:11px;font-weight:850;font-size:19px;letter-spacing:-.5px}.logo{width:34px;height:34px;border-radius:11px;background:var(--accent);display:grid;place-items:center;color:#fff;font-size:18px}
+.header-right{display:flex;gap:9px;align-items:center}.pill{background:#f2f4f8;color:#687180;padding:8px 12px;border-radius:99px;font-size:12px;font-weight:700}
+main{max-width:1180px;margin:34px auto;padding:0 22px 60px}.hero{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;gap:18px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:1.3px}.hero h1{font-size:30px;letter-spacing:-1.1px;margin:7px 0}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}.hero-actions{display:flex;gap:9px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}.stat,.panel,.tier-panel,.list-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.stat{padding:17px 19px}.stat small{color:var(--muted);font-weight:650}.stat strong{display:block;font-size:25px;margin-top:7px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:28px 0 13px}.section-head h2{font-size:18px;margin:0;letter-spacing:-.4px}.section-head span{font-size:12px;color:var(--muted)}
+.dashboard-grid{display:grid;grid-template-columns:1.45fr .85fr;gap:16px}.panel{padding:20px}.list{display:grid;gap:10px}.list-card{box-shadow:none;padding:13px;display:flex;align-items:center;justify-content:space-between;gap:12px}.user-info{display:flex;align-items:center;gap:12px;min-width:0}.avatar{width:42px;height:42px;border-radius:14px;background:#edf0ff;color:var(--accent);display:grid;place-items:center;font-weight:850;flex-shrink:0}.user-info strong{display:block;font-size:14px}.user-info small{color:var(--muted);font-size:12px}.card-actions{display:flex;gap:6px;flex-shrink:0}.empty{padding:30px 12px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
+.movie-mini{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.movie-mini:last-child{border:0}.poster-mini{width:39px;height:55px;object-fit:cover;border-radius:6px;background:#e9ebf0}.movie-mini strong{font-size:13px;display:block}.movie-mini small{font-size:11px;color:var(--muted)}
+.view{display:none}.view.active{display:block}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:18px 0;flex-wrap:wrap}.toolbar-left,.toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,select{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:none;min-width:0}input:focus,select:focus{border-color:#9ba9ff;box-shadow:0 0 0 3px #eef0ff}
+.tier-title{display:flex;align-items:center;gap:10px}.tier-title h2{margin:0;font-size:22px}.tier-title .sub{color:var(--muted);font-size:12px}
+.tier-board{display:grid;gap:12px;overflow:visible}.tier-row{display:grid;grid-template-columns:74px minmax(0,1fr);min-height:116px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:visible;position:relative}.tier-label{display:grid;place-items:center;font-weight:900;font-size:23px;color:#20242c;border-radius:13px 0 0 13px}.tier-label small{display:block;font-size:9px;font-weight:700;opacity:.65;margin-top:3px}.tier-drop{padding:12px;display:flex;align-content:flex-start;align-items:flex-start;gap:12px;flex-wrap:wrap;min-height:114px;min-width:0;overflow:visible}.tier-drop.over{background:#f0f2ff;outline:2px dashed #9aa8ff;outline-offset:-5px}.tier-drop:empty:after{content:"포스터를 여기에 놓아 보세요";color:#b1b7c1;font-size:12px;padding:10px}
+.tier-S .tier-label{background:#ffe5e7}.tier-A .tier-label{background:#ffedda}.tier-B .tier-label{background:#fff5d9}.tier-C .tier-label{background:#e6f4e9}.tier-D .tier-label{background:#e5efff}.tier-F .tier-label{background:#ece8f4}
+.movie{width:76px;position:relative;z-index:1;cursor:grab;user-select:none;flex:0 0 76px}.movie:hover,.movie:focus-within{z-index:30}.movie img{width:76px;height:108px;object-fit:cover;border-radius:8px;background:#e9ebf0;display:block;box-shadow:0 3px 10px #17203a18}.movie .movie-name{font-size:11px;line-height:1.4;margin-top:6px;white-space:normal;overflow-wrap:anywhere;word-break:keep-all;display:block;max-height:none;overflow:visible}.movie .movie-year{font-size:10px;color:var(--muted);margin-top:2px}.movie:hover .tip{display:block}.tip{display:none;position:absolute;top:calc(100% + 8px);bottom:auto;left:50%;transform:translateX(-50%);width:min(230px,70vw);background:#20242c;color:white;padding:11px 12px;border-radius:9px;font-size:12px;line-height:1.55;z-index:60;box-shadow:var(--shadow);pointer-events:none;white-space:normal;overflow-wrap:anywhere}.tip b{display:block;margin-bottom:4px}.remove-movie{position:absolute;right:-5px;top:-6px;width:20px;height:20px;border-radius:50%;padding:0;background:#20242c;color:#fff;font-size:12px;display:none;z-index:65}.movie:hover .remove-movie{display:block}
+.library{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;margin-top:16px}.library-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.library-head strong{font-size:14px}.library-grid{display:flex;gap:13px;flex-wrap:wrap;min-height:30px}.library .movie{width:70px}.library .movie img{width:70px;height:100px}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px}.compare-table th,.compare-table td{padding:12px;border-bottom:1px solid var(--line);text-align:left}.compare-table th{color:var(--muted);font-size:11px}.grade{display:inline-block;padding:4px 8px;border-radius:7px;background:#f0f2f6;font-weight:800}
+.modal-backdrop{position:fixed;inset:0;background:#151a2580;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal-backdrop.show{display:flex}.modal{width:min(500px,100%);background:#fff;border-radius:20px;padding:23px;box-shadow:0 25px 80px #0003;max-height:90vh;overflow:auto}.modal h3{margin:0 0 7px;font-size:20px}.modal p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 17px}.form{display:grid;gap:11px}.form label{font-size:12px;color:#596170;font-weight:750;display:grid;gap:6px}.form input{width:100%}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.notice{background:#fff8e8;border:1px solid #f4e6bf;border-radius:11px;padding:11px 13px;color:#826a2b;font-size:11px;line-height:1.6;margin-top:12px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#20242c;color:white;padding:11px 17px;border-radius:99px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}
+footer{max-width:1180px;margin:0 auto;padding:0 22px 30px;color:#9aa1ac;font-size:11px;line-height:1.7}
+@media(max-width:800px){main{margin:24px auto}.dashboard-grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:21px}.tier-row{grid-template-columns:55px minmax(0,1fr)}.tier-label{font-size:19px}.movie{width:65px;flex-basis:65px}.movie img{width:65px;height:93px}.tier-row{min-height:103px}.tier-drop{min-height:101px}.header-right .pill{display:none}}
+@media(max-width:480px){header{height:62px;padding:0 16px}.brand{font-size:16px}main{padding:0 14px 40px}.hero h1{font-size:25px}.stats{grid-template-columns:repeat(3,1fr)}.stat small{font-size:10px}.stat strong{font-size:18px}.list-card{align-items:flex-start}.card-actions button{padding:8px;font-size:11px}.toolbar{align-items:stretch}.toolbar-left,.toolbar-right{width:100%}.toolbar input{flex:1;width:100%}.tier-drop{gap:6px;padding:7px}.movie{width:58px;flex-basis:58px}.movie img{width:58px;height:84px}.tip{left:0;transform:none;width:min(220px,75vw)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">▶</div>무비 티어리스트</div>
+  <div class="header-right"><span class="pill">나만의 영화 취향 아카이브</span><button class="primary" id="newListTop">＋ 티어리스트 등록</button></div>
+</header>
+<main>
+  <section id="dashboard" class="view active">
+    <div class="hero">
+      <div><div class="eyebrow">MOVIE TIER LIST</div><h1>영화 취향을 나누고 비교해 보세요.</h1><p>나만의 영화 순위를 만들고, 친구들의 티어리스트도 자유롭게 둘러볼 수 있어요.</p></div>
+      <div class="hero-actions"><button class="primary" id="newListHero">＋ 새 티어리스트 만들기</button></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><small>등록된 티어리스트</small><strong id="statLists">0</strong></div>
+      <div class="stat"><small>등록된 영화</small><strong id="statMovies">0</strong></div>
+      <div class="stat"><small>참여 닉네임</small><strong id="statPeople">0</strong></div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="panel">
+        <div class="section-head" style="margin:0 0 14px"><h2>전체 티어리스트</h2><span>누구나 열람할 수 있어요</span></div>
+        <div id="listContainer" class="list"></div>
+      </div>
+      <div class="panel">
+        <div class="section-head" style="margin:0 0 8px"><h2>영화 비교</h2><span>등록된 평가 기준</span></div>
+        <div id="compareSummary"></div>
+        <div class="notice">이 파일은 브라우저에서 바로 실행되는 단일 파일 데모입니다. 저장 데이터는 현재 브라우저에만 보관됩니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="editor" class="view">
+    <div class="toolbar">
+      <div class="toolbar-left"><button class="secondary" id="backDash">← 대시보드</button><div class="tier-title"><div><h2 id="editorTitle">티어리스트</h2><div class="sub" id="editorOwner"></div></div></div></div>
+      <div class="toolbar-right"><button class="secondary" id="exportBtn">이미지 저장</button><button class="primary" id="editBtn">수정하기</button></div>
+    </div>
+    <div id="board" class="tier-board"></div>
+    <div class="library">
+      <div class="library-head"><strong>영화 보관함 <span style="color:#9aa1ac;font-weight:500">· 등급에 배치할 영화를 선택하세요</span></strong><button class="primary" id="addMovieBtn">＋ 영화 추가</button></div>
+      <div id="libraryGrid" class="library-grid"></div>
+    </div>
+    <div class="notice" id="editNotice">다른 사람의 티어리스트는 열람만 가능합니다. 수정하려면 해당 티어리스트의 비밀번호를 입력하세요.</div>
+  </section>
+
+  <section id="compare" class="view">
+    <div class="toolbar"><div class="toolbar-left"><button class="secondary" id="compareBack">← 대시보드</button><h2 style="margin:0">영화 평가 비교</h2></div></div>
+    <div class="panel"><p style="font-size:13px;color:var(--muted);margin-top:0">여러 티어리스트에 공통으로 등록된 영화의 평가를 비교합니다.</p><div id="compareContent"></div></div>
+  </section>
+</main>
+<footer>무비 티어리스트 · 단일 HTML 데모<br>실제 온라인 공유·다른 기기 간 동기화·다중 사용자 권한 관리는 서버와 데이터베이스 연결이 필요합니다.</footer>
+
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const STORE='movie-tier-list-single-file-v1';
+const tiers=['S','A','B','C','D','F'];
+let data=loadData(), currentId=null, editMode=false, dragMovie=null;
+const $=s=>document.querySelector(s);
+function loadData(){try{return JSON.parse(localStorage.getItem(STORE))||{lists:[]}}catch(e){return{lists:[]}}}
+function saveData(){localStorage.setItem(STORE,JSON.stringify(data));renderDashboard()}
+function uid(){return Math.random().toString(36).slice(2,10)}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg){let t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('#'+id).classList.add('active');window.scrollTo(0,0)}
+function modal(content){$('#modal').innerHTML=content;$('#modalBackdrop').classList.add('show')}
+function closeModal(){$('#modalBackdrop').classList.remove('show')}
+$('#modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')closeModal()});
+function renderDashboard(){
+ const lists=data.lists;$('#statLists').textContent=lists.length;
+ $('#statMovies').textContent=lists.reduce((n,l)=>n+l.movies.length,0);
+ $('#statPeople').textContent=new Set(lists.map(l=>l.nickname.toLowerCase())).size;
+ $('#listContainer').innerHTML=lists.length?lists.map(l=>`<div class="list-card"><div class="user-info"><div class="avatar">${esc(l.nickname.slice(0,1).toUpperCase())}</div><div><strong>${esc(l.title||l.nickname+'의 영화 티어리스트')}</strong><small>${esc(l.nickname)} · 영화 ${l.movies.length}편 · ${new Date(l.updated).toLocaleDateString('ko-KR')}</small></div></div><div class="card-actions"><button class="secondary" onclick="openList('${l.id}')">보기</button></div></div>`).join(''):'<div class="empty">아직 등록된 티어리스트가 없어요.<br>첫 번째 티어리스트를 만들어 보세요!</div>';
+ let counts={};lists.forEach(l=>l.movies.forEach(m=>{counts[m.title]??={count:0,grades:[]};counts[m.title].count++;if(m.tier)counts[m.title].grades.push(m.tier)}));
+ let top=Object.entries(counts).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
+ $('#compareSummary').innerHTML=top.length?top.map(([name,v])=>`<div class="movie-mini"><div class="avatar" style="width:35px;height:35px;border-radius:10px">🎬</div><div><strong>${esc(name)}</strong><small>${v.count}개 티어리스트에 등록</small></div></div>`).join(''):'<div class="empty">아직 비교할 영화가 없어요.</div>';
+}
+function createList(){
+ modal(`<h3>새 티어리스트 등록</h3><p>닉네임과 비밀번호를 등록하면 나만의 티어리스트가 만들어집니다.</p><form class="form" id="createForm"><label>닉네임<input name="nickname" maxlength="24" required placeholder="예: 소미"></label><label>비밀번호<input name="password" type="password" minlength="4" required placeholder="4자 이상"></label><label>티어리스트 이름 <span style="font-weight:400;color:#9aa1ac">(선택)</span><input name="title" maxlength="50" placeholder="예: 내가 사랑하는 영화들"></label><div class="modal-actions"><button type="button" class="secondary" onclick="closeModal()">취소</button><button class="primary">등록하기</button></div></form><div class="notice">비밀번호는 이 브라우저 안에서 수정 권한 확인에 사용됩니다. 실제 서비스에서는 서버 측 안전한 인증 처리가 필요합니다.</div>`);
+ $('#createForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target),nickname=f.get('nickname').trim(),password=f.get('password');if(data.lists.some(l=>l.nickname.toLowerCase()===nickname.toLowerCase())){toast('이미 사용 중인 닉네임입니다.');return}let l={id:uid(),nickname,password,title:f.get('title').trim(),movies:[],updated:Date.now()};data.lists.push(l);saveData();closeModal();openList(l.id);toast('티어리스트를 등록했어요.')};
+}
+function openList(id){currentId=id;editMode=false;renderEditor();showView('editor')}
+function current(){return data.lists.find(l=>l.id===currentId)}
+function renderEditor(){
+ let l=current();if(!l)return;$('#editorTitle').textContent=l.title||l.nickname+'의 영화 티어리스트';$('#editorOwner').textContent=l.nickname+' · '+l.movies.length+'편의 영화';
+ $('#editBtn').textContent=editMode?'편집 중':'수정하기';$('#editBtn').disabled=editMode;
+ $('#editNotice').textContent=editMode?'편집 모드입니다. 영화 포스터를 드래그해 등급을 변경할 수 있어요. 변경 사항은 자동 저장됩니다.':'누구나 열람할 수 있습니다. 수정하려면 해당 티어리스트의 비밀번호를 입력하세요.';
+ $('#board').innerHTML=tiers.map(t=>`<div class="tier-row tier-${t}"><div class="tier-label">${t}<small>${({S:'최고',A:'좋음',B:'괜찮음',C:'보통',D:'아쉬움',F:'최악'})[t]}</small></div><div class="tier-drop" data-tier="${t}">${l.movies.filter(m=>m.tier===t).map(movieHTML).join('')}</div></div>`).join('');
+ $('#libraryGrid').innerHTML=l.movies.filter(m=>!m.tier).map(movieHTML).join('')||'<span style="font-size:12px;color:#a3aab5">아직 등급을 지정하지 않은 영화가 없습니다.</span>';
+ document.querySelectorAll('.tier-drop').forEach(el=>{el.addEventListener('dragover',e=>{if(editMode){e.preventDefault();el.classList.add('over')}});el.addEventListener('dragleave',()=>el.classList.remove('over'));el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('over');if(!editMode||!dragMovie)return;let m=l.movies.find(x=>x.id===dragMovie);if(m){m.tier=el.dataset.tier;l.updated=Date.now();saveData();renderEditor()}})});
+}
+function movieHTML(m){return `<div class="movie" draggable="${editMode}" ondragstart="dragMovie='${m.id}'" ondragend="dragMovie=null"><img src="${esc(m.poster||placeholder(m.title))}" alt="${esc(m.title)}"><button class="remove-movie" title="영화 삭제" onclick="removeMovie('${m.id}')">×</button><div class="movie-name">${esc(m.title)}</div><div class="movie-year">${esc(m.year||'')}</div><div class="tip"><b>${esc(m.title)} ${esc(m.year||'')}</b>${esc(m.genre||'장르 정보 없음')}<br>${esc(m.overview||'줄거리 정보가 없습니다.')}</div></div>`}
+function placeholder(title){return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="160" height="230"><rect width="100%" height="100%" fill="#e9ecf3"/><text x="50%" y="45%" text-anchor="middle" font-size="35" fill="#9ba4b5">▶</text><text x="50%" y="62%" text-anchor="middle" font-size="12" fill="#737d8e">${String(title).slice(0,12).replace(/[&<>]/g,'')}</text></svg>`)}
+function removeMovie(id){if(!editMode)return;let l=current();l.movies=l.movies.filter(m=>m.id!==id);l.updated=Date.now();saveData();renderEditor()}
+function unlock(){let l=current();modal(`<h3>티어리스트 수정</h3><p><b>${esc(l.nickname)}</b>님의 티어리스트를 수정하려면 등록할 때 설정한 비밀번호를 입력하세요.</p><form class="form" id="unlockForm"><label>비밀번호<input name="password" type="password" required autofocus></label><div class="modal-actions"><button type="button" class="secondary" onclick="closeModal()">취소</button><button class="primary">확인</button></div></form>`);$('#unlockForm').onsubmit=e=>{e.preventDefault();if(new FormData(e.target).get('password')===l.password){editMode=true;closeModal();renderEditor();toast('수정 모드로 전환했어요.')}else toast('비밀번호가 일치하지 않습니다.')}}
+function addMovie(){
+ if(!editMode){toast('먼저 수정하기를 눌러 주세요.');return}
+ modal(`<h3>영화 추가</h3><p>영화 정보를 입력하거나 포스터 이미지를 직접 선택할 수 있습니다.</p><form class="form" id="movieForm"><label>영화 제목<input name="title" required maxlength="80" placeholder="예: 기생충"></label><label>개봉 연도<input name="year" maxlength="4" placeholder="예: 2019"></label><label>장르<input name="genre" maxlength="40" placeholder="예: 드라마, 스릴러"></label><label>줄거리<input name="overview" maxlength="220" placeholder="간단한 영화 소개"></label><label>포스터 이미지<input name="poster" type="file" accept="image/*"></label><div class="modal-actions"><button type="button" class="secondary" onclick="closeModal()">취소</button><button class="primary">추가하기</button></div></form><div class="notice">외부 서버 연결이 없는 단일 파일이므로 영화 데이터 자동 검색은 연결되어 있지 않습니다. 이 데모에서는 직접 입력 및 이미지 업로드를 사용할 수 있습니다.</div>`);
+ $('#movieForm').onsubmit=async e=>{e.preventDefault();let f=new FormData(e.target),file=f.get('poster'),poster='';if(file&&file.size){if(file.size>1500000){toast('이미지는 1.5MB 이하로 선택해 주세요.');return}poster=await new Promise(res=>{let r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file)})}let l=current();l.movies.push({id:uid(),title:f.get('title').trim(),year:f.get('year').trim(),genre:f.get('genre').trim(),overview:f.get('overview').trim(),poster,tier:null});l.updated=Date.now();saveData();closeModal();renderEditor();toast('영화를 추가했어요.')};
+}
+function compare(){
+ let map={};data.lists.forEach(l=>l.movies.forEach(m=>{(map[m.title]??=[]).push({nick:l.nickname,tier:m.tier||'미분류'})}));
+ let rows=Object.entries(map).filter(([k,v])=>v.length>1);
+ $('#compareContent').innerHTML=rows.length?`<table class="compare-table"><thead><tr><th>영화</th><th>평가 참여</th><th>참여자별 등급</th></tr></thead><tbody>${rows.map(([name,arr])=>`<tr><td><b>${esc(name)}</b></td><td>${arr.length}명</td><td>${arr.map(a=>`<span style="margin:2px;display:inline-block">${esc(a.nick)} <span class="grade">${esc(a.tier)}</span></span>`).join('')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">두 개 이상의 티어리스트에 공통으로 등록된 영화가 생기면 비교할 수 있어요.</div>';
+ showView('compare')
+}
+function exportImage(){
+ let l=current();if(!l)return;
+ let width=1200,rowH=150,head=110,height=head+tiers.length*rowH+35,canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;let c=canvas.getContext('2d');c.fillStyle='#f6f7f9';c.fillRect(0,0,width,height);c.fillStyle='#20242c';c.font='bold 32px sans-serif';c.fillText(l.title||l.nickname+'의 영화 티어리스트',40,55);c.fillStyle='#77808d';c.font='16px sans-serif';c.fillText(l.nickname+' · 무비 티어리스트',40,83);
+ let colors={S:'#ffe5e7',A:'#ffedda',B:'#fff5d9',C:'#e6f4e9',D:'#e5efff',F:'#ece8f4'};
+ let pending=0,done=()=>{if(--pending===0){let a=document.createElement('a');a.download='movie-tier-list.png';a.href=canvas.toDataURL('image/png');a.click();toast('이미지를 저장했어요.')}};
+ tiers.forEach((t,i)=>{let y=head+i*rowH;c.fillStyle='#fff';c.fillRect(30,y,width-60,rowH-8);c.fillStyle=colors[t];c.fillRect(30,y,76,rowH-8);c.fillStyle='#20242c';c.font='bold 30px sans-serif';c.fillText(t,54,y+65);let arr=l.movies.filter(m=>m.tier===t);arr.forEach((m,j)=>{let x=125+j*95;let img=new Image();img.onload=()=>{c.drawImage(img,x,y+8,70,100);c.fillStyle='#20242c';c.font='11px sans-serif';c.fillText(m.title.slice(0,12),x,y+120);done()};img.onerror=()=>{c.fillStyle='#e9ecf3';c.fillRect(x,y+8,70,100);c.fillStyle='#20242c';c.font='10px sans-serif';c.fillText(m.title.slice(0,10),x+2,y+60);done()};pending++;img.src=m.poster||placeholder(m.title)})});
+ if(!pending){let a=document.createElement('a');a.download='movie-tier-list.png';a.href=canvas.toDataURL('image/png');a.click()}
+}
+$('#newListTop').onclick=$('#newListHero').onclick=createList;
+$('#backDash').onclick=()=>{editMode=false;showView('dashboard');renderDashboard()};
+$('#compareBack').onclick=()=>showView('dashboard');
+$('#editBtn').onclick=unlock;$('#addMovieBtn').onclick=addMovie;$('#exportBtn').onclick=exportImage;
+window.openList=openList;window.removeMovie=removeMovie;window.dragMovie=null;
+$('#compareSummary').addEventListener('click',compare);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+renderDashboard();
+</script>
+</body>
+</html>
